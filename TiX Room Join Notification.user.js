@@ -5,8 +5,8 @@
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_notification
-// @updateURL
-// @downloadURL
+// @updateURL    https://github.com/JRoot3D/TiX-Tools/raw/master/TiX%20Room%20Join%20Notification.user.js
+// @downloadURL  https://github.com/JRoot3D/TiX-Tools/raw/master/TiX%20Room%20Join%20Notification.user.js
 // ==/UserScript==
 
 (function() {
