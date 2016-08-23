@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Room Join Notification
 // @namespace    https://tixchat.com/
-// @version      1.2
+// @version      1.3
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_notification
