@@ -124,9 +124,8 @@
 	}
 
 	function checkKey(e) {
-		if (_moveMenu.getFlag()) {
-			e = e || window.event;
-
+		e = e || window.event;
+		if (_moveMenu.getFlag() && ['SELECT', 'INPUT', 'TEXTAREA'].indexOf(e.target.tagName) == -1) {
 			var room = getCurrentRoom();
 
 			if (room) {
