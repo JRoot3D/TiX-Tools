@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Keyboard Move
 // @namespace    https://tixchat.com/
-// @version      1.5
+// @version      1.6
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
@@ -11,131 +11,131 @@
 // ==/UserScript==
 
 (function() {
-	'use strict';
+    'use strict';
 
-	document.onkeydown = checkKey;
+    document.onkeydown = checkKey;
 
-	var WASD = {
-		name: 'WASD',
-		left: 65,
-		right: 68,
-		up: 87,
-		down: 83
-	};
+    var WASD = {
+        name: 'WASD',
+        left: 65,
+        right: 68,
+        up: 87,
+        down: 83
+    };
 
-	var ARROWS = {
-		name: 'ARROWS',
-		left: 37,
-		right: 39,
-		up: 38,
-		down: 40
-	};
+    var ARROWS = {
+        name: 'ARROWS',
+        left: 37,
+        right: 39,
+        up: 38,
+        down: 40
+    };
 
-	var _moveSettings = ARROWS;
-	var _moveModeMenu;
+    var _moveSettings = ARROWS;
+    var _moveModeMenu;
 
-	var myCommand = function(trueCaption, falseCaption, defaultFlag, callback) {
-		var _flag = defaultFlag;
-		var _callback = callback;
-		var _id;
-		function switchCommand() {
-			if (_flag) {
-				GM_unregisterMenuCommand(_id);
-				_id = GM_registerMenuCommand(trueCaption, switchCommand);
-			} else {
-				GM_unregisterMenuCommand(_id);
-				_id = GM_registerMenuCommand(falseCaption, switchCommand);
-			}
+    var myCommand = function(trueCaption, falseCaption, defaultFlag, callback) {
+        var _flag = defaultFlag;
+        var _callback = callback;
+        var _id;
 
-			_flag = !_flag;
+        function switchCommand() {
+            if (_flag) {
+                GM_unregisterMenuCommand(_id);
+                _id = GM_registerMenuCommand(trueCaption, switchCommand);
+            } else {
+                GM_unregisterMenuCommand(_id);
+                _id = GM_registerMenuCommand(falseCaption, switchCommand);
+            }
 
-			if (_callback) {
-				_callback.call(this);
-			}
-		}
+            _flag = !_flag;
 
-		if (defaultFlag) {
-			_id = GM_registerMenuCommand(falseCaption, switchCommand);
-		} else {
-			_id = GM_registerMenuCommand(trueCaption, switchCommand);
-		}
+            if (_callback) {
+                _callback.call(this);
+            }
+        }
 
-		this.getFlag = function() {
-			return _flag;
-		};
+        if (defaultFlag) {
+            _id = GM_registerMenuCommand(falseCaption, switchCommand);
+        } else {
+            _id = GM_registerMenuCommand(trueCaption, switchCommand);
+        }
 
-		this.unregister = function() {
-			GM_unregisterMenuCommand(_id);
-		};
+        this.getFlag = function() {
+            return _flag;
+        };
 
-		this.setCallback = function(value) {
-			_callback = value;
-		};
-	};
+        this.unregister = function() {
+            GM_unregisterMenuCommand(_id);
+        };
 
-	function switchMoveMode() {
-		if (_moveModeMenu.getFlag()) {
-			_moveSettings = WASD;
-		} else {
-			_moveSettings = ARROWS;
-		}
+        this.setCallback = function(value) {
+            _callback = value;
+        };
+    };
 
-		new C.Notification({
-			css_class: 'message',
-			view: C.View('notification/system', {
-				text: 'Current mode: ' + _moveSettings.name
-			})
-		}).show(2000);
-	}
+    function switchMoveMode() {
+        if (_moveModeMenu.getFlag()) {
+            _moveSettings = WASD;
+        } else {
+            _moveSettings = ARROWS;
+        }
 
-	var _moveMenu = new myCommand('Enable keyboard Move', 'Disable keyboard Move', false, createModeMenu);
+        new C.Notification({
+            css_class: 'message',
+            view: C.View('notification/system', {
+                text: 'Current mode: ' + _moveSettings.name
+            })
+        }).show(2000);
+    }
 
-	function createModeMenu() {
-		if (_moveMenu.getFlag()) {
-			var flag = false;
-			if (_moveModeMenu)
-			{
-				flag = _moveModeMenu.getFlag();
-				_moveModeMenu.unregister();
-			}
-			_moveModeMenu = new myCommand('Switch to WASD', 'Switch to ARROWS', flag, switchMoveMode);
-			switchMoveMode();
-		} else {
-			_moveModeMenu.unregister();
-		}
-	}
+    var _moveMenu = new myCommand('Enable keyboard Move', 'Disable keyboard Move', false, createModeMenu);
 
-	function getCurrentRoom() {
-		var path = location.pathname;
-		if (path.indexOf('room') != -1) {
-			var arr = path.split("/");
-			var roomID = arr[arr.length-1];
-			return C.rooms[roomID];
-		}
-		return null;
-	}
+    function createModeMenu() {
+        if (_moveMenu.getFlag()) {
+            var flag = false;
+            if (_moveModeMenu) {
+                flag = _moveModeMenu.getFlag();
+                _moveModeMenu.unregister();
+            }
+            _moveModeMenu = new myCommand('Switch to WASD', 'Switch to ARROWS', flag, switchMoveMode);
+            switchMoveMode();
+        } else {
+            _moveModeMenu.unregister();
+        }
+    }
 
-	function roomMove(room, x, y) {
-		var me = room.avatars[C.user.data.id];
-		room.request('move', {
-			'x': me.x + x,
-			'y': me.y + y
-		});
-	}
+    function getCurrentRoom() {
+        var path = location.pathname;
+        if (path.indexOf('room') != -1) {
+            var arr = path.split("/");
+            var roomID = arr[arr.length - 1];
+            return C.rooms[roomID];
+        }
+        return null;
+    }
 
-	function checkKey(e) {
-		e = e || window.event;
-		if (_moveMenu.getFlag() && ['SELECT', 'INPUT', 'TEXTAREA'].indexOf(e.target.tagName) == -1) {
-			var room = getCurrentRoom();
+    function roomMove(room, deltaX, deltaY) {
+        if (deltaX !== 0 || deltaY !== 0) {
+            var me = room.avatars[C.user.data.id];
+            room.request('move', {
+                'x': me.x + deltaX,
+                'y': me.y + deltaY
+            });
+        }
+    }
 
-			if (room) {
-				var keyCode = e.keyCode;
-				var deltaX = keyCode == _moveSettings.left ? -1 : (keyCode == _moveSettings.right ? 1 : 0);
-				var deltaY = keyCode == _moveSettings.up   ? -1 : (keyCode == _moveSettings.down  ? 1 : 0);
-				if (deltaX !== 0 || deltaY !== 0) {
-					roomMove(room, deltaX, deltaY);
-				}
-			}
-		}
-	}
+    function checkKey(e) {
+        e = e || window.event;
+        if (_moveMenu.getFlag() && ['SELECT', 'INPUT', 'TEXTAREA'].indexOf(e.target.tagName) == -1) {
+            var room = getCurrentRoom();
+
+            if (room) {
+                var keyCode = e.keyCode;
+                var deltaX = keyCode == _moveSettings.left ? -1 : (keyCode == _moveSettings.right ? 1 : 0);
+                var deltaY = keyCode == _moveSettings.up ? -1 : (keyCode == _moveSettings.down ? 1 : 0);
+                roomMove(room, deltaX, deltaY);
+            }
+        }
+    }
 })();
