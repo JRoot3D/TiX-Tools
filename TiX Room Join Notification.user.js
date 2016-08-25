@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Room Join Notification
 // @namespace    https://tixchat.com/
-// @version      1.3
+// @version      1.4
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_notification
@@ -31,8 +31,8 @@
 
 			if (C.contacts[user.id]) {
 				var details = {};
-				details.text = user.data.name;
-				details.title = room.data.name;
+				details.text = room.data.name;
+				details.title = user.data.name;
 				var ba = new C.BigAvatar(user, {
 					height: 64,
 					width: 64,
