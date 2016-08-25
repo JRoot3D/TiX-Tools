@@ -15,6 +15,9 @@
 
     document.onkeydown = checkKey;
 
+    var IGHORE_TARGETS = ['SELECT', 'INPUT', 'TEXTAREA'];
+    var LISTEN_KEYS = [37, 38, 39, 40, 65, 68, 83, 87];
+
     var WASD = {
         name: 'WASD',
         left: 65,
@@ -127,7 +130,7 @@
 
     function checkKey(e) {
         e = e || window.event;
-        if (_moveMenu.getFlag() && ['SELECT', 'INPUT', 'TEXTAREA'].indexOf(e.target.tagName) == -1) {
+        if (_moveMenu.getFlag() && LISTEN_KEYS.indexOf(e.keyCode) > -1 && IGHORE_TARGETS.indexOf(e.target.tagName) == -1) {
             var room = getCurrentRoom();
 
             if (room) {
