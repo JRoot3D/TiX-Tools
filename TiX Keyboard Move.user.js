@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Keyboard Move
 // @namespace    https://tixchat.com/
-// @version      1.4
+// @version      1.5
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
@@ -79,6 +79,13 @@
 		} else {
 			_moveSettings = ARROWS;
 		}
+
+		new C.Notification({
+			css_class: 'message',
+			view: C.View('notification/system', {
+				text: 'Current mode: ' + _moveSettings.name
+			})
+		}).show(2000);
 	}
 
 	var _moveMenu = new myCommand('Enable keyboard Move', 'Disable keyboard Move', false, createModeMenu);
@@ -91,7 +98,8 @@
 				flag = _moveModeMenu.getFlag();
 				_moveModeMenu.unregister();
 			}
-			_moveModeMenu = new myCommand('Switch to WASD', 'Switch to Arrows', flag, switchMoveMode);
+			_moveModeMenu = new myCommand('Switch to WASD', 'Switch to ARROWS', flag, switchMoveMode);
+			switchMoveMode();
 		} else {
 			_moveModeMenu.unregister();
 		}
