@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
@@ -199,16 +199,13 @@
 
 	if(!alertify.loginDialog){
 		alertify.dialog('loginDialog', function() {
-			var nameMessage = document.createElement('P');
-			var nameInput = document.createElement("INPUT");
 			var loginMessage = document.createElement('P');
 			var loginInput = document.createElement("INPUT");
 			var passwordMessage = document.createElement('P');
 			var passwordInput = document.createElement("INPUT");
 			return {
-				main:function(_title, _nameMessage, _loginMessage, _passwordMessage, _onok, _oncancel){
+				main:function(_title,_loginMessage, _passwordMessage, _onok, _oncancel){
 					this.set('title', _title);
-					this.set('nameMessage', _nameMessage);
 					this.set('loginMessage', _loginMessage);
 					this.set('passwordMessage', _passwordMessage);
 					this.set('onok', _onok);
@@ -242,17 +239,12 @@
 					};
 				},
 				build: function () {
-					nameInput.className = alertify.defaults.theme.input;
-					nameInput.setAttribute('type', 'text');
-
 					loginInput.className = alertify.defaults.theme.input;
 					loginInput.setAttribute('type', 'text');
 
 					passwordInput.className = alertify.defaults.theme.input;
 					passwordInput.setAttribute('type', 'password');
 
-					this.elements.content.appendChild(nameMessage);
-					this.elements.content.appendChild(nameInput);
 					this.elements.content.appendChild(loginMessage);
 					this.elements.content.appendChild(loginInput);
 					this.elements.content.appendChild(passwordMessage);
@@ -275,9 +267,6 @@
 						case 'passwordMessage':
 							this.setMessageToField(passwordMessage, newValue);
 							break;
-						case 'nameMessage':
-							this.setMessageToField(nameMessage, newValue);
-							break;
 						case 'labels':
 							if (newValue.ok && this.__internal.buttons[0].element) {
 								this.__internal.buttons[0].element.innerHTML = newValue.ok;
@@ -291,8 +280,7 @@
 				callback:function(closeEvent){
 					var data = {
 						login: loginInput.value,
-						password: passwordInput.value,
-						name: nameInput.value
+						password: passwordInput.value
 					};
 
 					var returnValue;
@@ -317,7 +305,6 @@
 					labels: undefined,
 					loginMessage: '',
 					passwordMessage: '',
-					nameMessage: '',
 					onok: undefined,
 					oncancel: undefined,
 					islogin: false
@@ -326,7 +313,7 @@
 		});
 	}
 
-	function onOk (event, data) {
+	function saveUser (event, data) {
 		alertify.loginDialog().set('islogin', false);
 
 		var c = coastline();
@@ -341,11 +328,21 @@
 					var id = getUserId(token);
 					var saveData = {
 						'token': token,
-						'name': data.name,
 						'id': id
 					};
-					GM_setValue(id, saveData);
-					alertify.loginDialog().close().set('islogin', true);
+
+					var req = {
+						method:'get',
+						scope:'user',
+						user: id
+					};
+
+					C.socket.sendRequest(req, function (responce) {
+						saveData.name = responce.user.name;
+						GM_setValue(id, saveData);
+						alertify.loginDialog().close().set('islogin', true);
+						alertify.notify('User: ' + saveData.name);
+					});
 				}
 			}).grab('wrong', function () {
 				alertify.error('Wrong Login or Password');
@@ -371,7 +368,7 @@
 	}
 
 	function addUser() {
-		alertify.loginDialog("Add User", "Name", "Email", "Password", onOk);
+		alertify.loginDialog("Add User", "Email", "Password", saveUser);
 	}
 
 	GM_registerMenuCommand("[M] Select User", showUsers);
