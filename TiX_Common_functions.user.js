@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Common functions
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @author       JRoot3D
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
