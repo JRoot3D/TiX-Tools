@@ -7,61 +7,56 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
-// @grant        none
 // ==/UserScript==
 
-(function() {
-	'use strict';
+function CF_addStyle(name) {
+    var style = GM_getResourceText(name);
+    GM_addStyle(style);
+}
 
-	function CF_addStyle(name) {
-		var style = GM_getResourceText(name);
-		GM_addStyle(style);
-	}
+function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
+    return CF_registerSwitcherMenuCommand('☑' + сaption, '☐' + caption, defaultFlag, callback)
+}
 
-	function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
-		return CF_registerSwitcherMenuCommand('☑' + сaption, '☐' + caption, defaultFlag, callback)
-	}
+function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
+    var _flag = defaultFlag || true;
+    var _callback = callback;
+    var _id;
 
-	function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
-		var _flag = defaultFlag || true;
-		var _callback = callback;
-		var _id;
+    var _trueCaption = trueCaption;
+    var _falseCaption = falseCaption;
 
-		var _trueCaption = trueCaption;
-		var _falseCaption = falseCaption;
+    function switchCommand() {
+        if (_flag) {
+            GM_unregisterMenuCommand(_id);
+            _id = GM_registerMenuCommand(_trueCaption, switchCommand);
+        } else {
+            GM_unregisterMenuCommand(_id);
+            _id = GM_registerMenuCommand(_falseCaption, switchCommand);
+        }
 
-		function switchCommand() {
-			if (_flag) {
-				GM_unregisterMenuCommand(_id);
-				_id = GM_registerMenuCommand(_trueCaption, switchCommand);
-			} else {
-				GM_unregisterMenuCommand(_id);
-				_id = GM_registerMenuCommand(_falseCaption, switchCommand);
-			}
+        _flag = !_flag;
 
-			_flag = !_flag;
+        if (_callback) {
+            _callback.call(this);
+        }
+    }
 
-			if (_callback) {
-				_callback.call(this);
-			}
-		}
+    if (defaultFlag) {
+        _id = GM_registerMenuCommand(_falseCaption, switchCommand);
+    } else {
+        _id = GM_registerMenuCommand(_trueCaption, switchCommand);
+    }
 
-		if (defaultFlag) {
-			_id = GM_registerMenuCommand(_falseCaption, switchCommand);
-		} else {
-			_id = GM_registerMenuCommand(_trueCaption, switchCommand);
-		}
+    this.getFlag = function() {
+        return _flag;
+    };
 
-		this.getFlag = function() {
-			return _flag;
-		};
+    this.unregister = function() {
+        GM_unregisterMenuCommand(_id);
+    };
 
-		this.unregister = function() {
-			GM_unregisterMenuCommand(_id);
-		};
-
-		this.setCallback = function(value) {
-			_callback = value;
-		};
-	}
-})();
+    this.setCallback = function(value) {
+        _callback = value;
+    };
+}
