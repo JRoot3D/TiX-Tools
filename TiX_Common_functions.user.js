@@ -15,7 +15,7 @@ function CF_addStyle(name) {
 }
 
 function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
-    return CF_registerSwitcherMenuCommand('☑' + сaption, '☐' + caption, defaultFlag, callback)
+    return CF_registerSwitcherMenuCommand('☑' + caption, '☐' + caption, defaultFlag, callback)
 }
 
 function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
