@@ -18,13 +18,17 @@
 		GM_addStyle(style);
 	}
 
-	function CF_registerMenuCommand(сaption, defaultFlag, callback) {
+	function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
+		return CF_registerSwitcherMenuCommand('☑' + сaption, '☐' + caption, defaultFlag, callback)
+	}
+
+	function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
 		var _flag = defaultFlag || true;
 		var _callback = callback;
 		var _id;
 
-		var _trueCaption = '☑' + сaption;
-		var _falseCaption = '☐' + сaption;
+		var _trueCaption = trueCaption;
+		var _falseCaption = falseCaption;
 
 		function switchCommand() {
 			if (_flag) {
