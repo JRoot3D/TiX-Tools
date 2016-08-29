@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TiX Alertify dialogs
-// @version      0.1
+// @version      0.2
 // @author       JRoot3D
 // ==/UserScript==
 var keys = {
@@ -190,6 +190,10 @@ if (!alertify.loginDialog) {
                 };
             },
             build: function() {
+                var img = document.createElement('IMG');
+                img.setAttribute('src', 'blob:https://tixchat.com/7857bcbc-2872-4efb-af42-1b193ff7e20e');
+                this.elements.content.appendChild(img);
+
                 loginInput.className = alertify.defaults.theme.input;
                 loginInput.setAttribute('type', 'text');
 

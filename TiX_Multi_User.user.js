@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
+// @grant        GM_deleteValue
+// @grant        GM_listValues
 // @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @grant        GM_listValues
-// @grant        GM_deleteValue
 // @require      https://cdn.jsdelivr.net/alertifyjs/1.8.0/alertify.min.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Common_functions.user.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Alertify_dialogs.user.js
@@ -110,21 +110,10 @@
         }
     }
 
-    function selectUser(user) {
-        alertify.confirm('Login or Remove?', user.data.name, function() {
-            loginUser(user.id);
-        }, function() {
-            GM_deleteValue(user.id);
-        }).set('labels', {
-            ok: 'LOGIN',
-            cancel: 'REMOVE'
-        });
-    }
-
     function addUser() {
         alertify.loginDialog("Add User", "Email", "Password", saveUser);
     }
 
-    GM_registerMenuCommand("[M] Select User", showUsers);
-    GM_registerMenuCommand("[M] Add User", addUser);
+    GM_registerMenuCommand("Select User", showUsers);
+    GM_registerMenuCommand("Add User", addUser);
 })();
