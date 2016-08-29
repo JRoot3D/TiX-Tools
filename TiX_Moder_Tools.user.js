@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Moder Tools
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -17,39 +17,47 @@
 // ==/UserScript==
 
 (function() {
-	'use strict';
+    'use strict';
 
-	CF_addStyle('alertifyCSS');
-	CF_addStyle('alertifyDefaultCSS');
+    CF_addStyle('alertifyCSS');
+    CF_addStyle('alertifyDefaultCSS');
 
-	var refExp_img = new RegExp('jpg|png|gif|jpeg', 'ig');
+    var refExp_img = new RegExp('jpg|png|gif|jpeg', 'ig');
 
-	var _pictureFilter = CF_registerCheckBoxMenuCommand('Pictures Filter', false);
+    var _pictureFilter = CF_registerCheckBoxMenuCommand('Pictures Filter', false);
 
-	function removeMessage(c, room, user, msg) {
-		room.request('removeMessage', {
-			uid: user.id,
-			time: msg.time
-		}, function (data) {
-			alertify.notify('Removed message from: ' + user.data.name);
-		}).grab('access denied', function () {
-			//C.Alert(T('Access denied'));
-		});
-	}
+    function removeMessage(c, room, user, msg) {
+        if (room.access.remove_message)
+            room.request('removeMessage', {
+                uid: user.id,
+                time: msg.time
+            }, function(data) {
+                alertify.notify('Removed message from: ' + user.data.name);
+            }).grab('access denied', function() {
+                C.Alert(T('Access denied'));
+            });
+    }
 
-	var fun = coastline.funMaker({ add_this: true });
+    var fun = coastline.funMaker({
+        add_this: true
+    });
 
-	var RoomModerator = Class({
-		makeChatMessage: fun(function (c, room, user, msg) {
-			room.makeChatSomething(c, user, msg, { message: true });
+    var RoomModerator = Class({
+        makeChatMessage: fun(function(c, room, user, msg) {
+            room.makeChatSomething(c, user, msg, {
+                message: true
+            });
 
-			var text = msg.text;
+            var text = msg.text;
 
-			if (_pictureFilter.getFlag() && (text.search(refExp_img) != -1 || text.length > 500) ) {
-				removeMessage(c, room, user, msg);
-			}
-		})
-	});
+            //moderation
+            if (room.access && room.access.remove_message) {
+                if (_pictureFilter.getFlag() && (text.search(refExp_img) != -1 || text.length > 500)) {
+                    removeMessage(c, room, user, msg);
+                }
+            }
+        })
+    });
 
-	jsface.extend(C.Room, RoomModerator);
+    jsface.extend(C.Room, RoomModerator);
 })();
