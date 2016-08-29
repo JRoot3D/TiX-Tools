@@ -13,10 +13,10 @@ function CF_addStyle(name) {
     GM_addStyle(style);
 }
 
-var _menuCommand = function(trueCaption, falseCaption, defaultFlag, callback) {
-    var _flag = defaultFlag || true;
+var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
+    var _flag = flag;
     var _callback = callback;
-    var _id;
+    var _id = undefined;
 
     var _trueCaption = trueCaption;
     var _falseCaption = falseCaption;
@@ -33,11 +33,11 @@ var _menuCommand = function(trueCaption, falseCaption, defaultFlag, callback) {
         _flag = !_flag;
 
         if (_callback) {
-            _callback.call(this);
+            _callback.call(this, _flag);
         }
     }
 
-    if (defaultFlag) {
+    if (_flag) {
         _id = GM_registerMenuCommand(_falseCaption, switchCommand);
     } else {
         _id = GM_registerMenuCommand(_trueCaption, switchCommand);
@@ -56,10 +56,10 @@ var _menuCommand = function(trueCaption, falseCaption, defaultFlag, callback) {
     };
 };
 
-function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
-    return new _menuCommand('☐ ' + caption, '☑ ' + caption, defaultFlag, callback)
+function CF_registerCheckBoxMenuCommand(caption, flag, callback) {
+    return new _menuCommand('☐ ' + caption, '☑ ' + caption, flag, callback)
 }
 
-function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
-    return new _menuCommand(trueCaption, falseCaption, defaultFlag, callback)
+function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, flag, callback) {
+    return new _menuCommand(trueCaption, falseCaption, flag, callback)
 }
