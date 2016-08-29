@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Common functions
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @author       JRoot3D
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
@@ -15,7 +15,7 @@ function CF_addStyle(name) {
 }
 
 function CF_registerCheckBoxMenuCommand(caption, defaultFlag, callback) {
-    return CF_registerSwitcherMenuCommand('☑' + caption, '☐' + caption, defaultFlag, callback)
+    return new CF_registerSwitcherMenuCommand('☑ ' + caption, '☐ ' + caption, defaultFlag, callback)
 }
 
 function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, defaultFlag, callback) {
