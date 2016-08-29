@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
@@ -97,7 +97,7 @@
                 setup: function() {
                     return {
                         buttons: [{
-                            text: "ADD USER",
+                            text: "ADD",
                             className: alertify.defaults.theme.cancel,
                         }, {
                             text: "REMOVE",
@@ -390,4 +390,5 @@
     }
 
     GM_registerMenuCommand("[M] Select User", showUsers);
+    GM_registerMenuCommand("[M] Add User", addUser);
 })();
