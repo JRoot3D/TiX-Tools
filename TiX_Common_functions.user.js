@@ -63,3 +63,13 @@ function CF_registerCheckBoxMenuCommand(caption, flag, callback) {
 function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, flag, callback) {
     return new _menuCommand(trueCaption, falseCaption, flag, callback)
 }
+
+function getCurrentRoom() {
+	var path = location.pathname;
+	if (path.indexOf('room') != -1) {
+		var arr = path.split("/");
+		var roomID = arr[arr.length-1];
+		return C.rooms[roomID];
+	}
+	return null;
+}
