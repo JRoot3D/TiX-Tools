@@ -64,7 +64,7 @@ function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, flag, callbac
     return new _menuCommand(trueCaption, falseCaption, flag, callback)
 }
 
-function getCurrentRoom() {
+function CF_getCurrentRoom() {
 	var path = location.pathname;
 	if (path.indexOf('room') != -1) {
 		var arr = path.split("/");

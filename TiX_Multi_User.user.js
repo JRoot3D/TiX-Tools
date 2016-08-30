@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_registerMenuCommand
@@ -116,4 +116,92 @@
 
     GM_registerMenuCommand("Select User", showUsers);
     GM_registerMenuCommand("Add User", addUser);
+
+    var initCustomContent = function() {
+        var selectUserMenuItem = '<a class="el users"><span class="Square FA FA-users"></span><span class="title">Select User</span></a>';
+        var linkSelectUser = $('.Menu .capsule .wardrobe').after(selectUserMenuItem).next();
+        linkSelectUser.on('click', function(e) {
+            showUsers();
+        });
+
+        var addUserMenuItem = '<a class="el"><span class="Square FA FA-plus-circle"></span><span class="title">Add User</span></a>';
+        var linkAddUser = $('.Menu .capsule .users').after(addUserMenuItem).next();
+        linkAddUser.on('click', function(e) {
+            addUser();
+        });
+
+        initCustomContent = undefined;
+    };
+
+    var PageManagerExtended = Class({
+        openURI: function(uri, options) {
+            if (initCustomContent) {
+                initCustomContent();
+            }
+            var pm = this;
+
+            C.loadingOverlay.add('pageManager openURI ' + uri);
+            uri = uri || location.pathname;
+            options = _.defaults(options || {}, {
+                pushState: true
+            });
+
+            var split = uri.split('/');
+            var kind = split[1];
+            var id = split[2];
+
+
+            if (pm.pages[id]) { // this is valid only for users and rooms
+                C.loadingOverlay.remove('pageManager room or user found ' + id);
+                return pm.open(id, null, {
+                    pushState: options.pushState
+                });
+            } else if (kind == 'room' && C.client) {
+                C.loadingOverlay.remove('pageManager joining room ' + id);
+                C.Room.join(id)
+                    .then(function(room) {
+                        if (room) {
+                            pm.open(room.id, null, {
+                                pushState: options.pushState
+                            });
+                            ga('send', 'event', 'room action', 'join', room.id);
+                        }
+                    });
+            } else if (kind == 'user' && C.client) {
+                C.loadingOverlay.remove('pageManager fetching user ' + id);
+                C.User.fetch(id)
+                    .then(function(user) {
+                        user && user.open(true);
+                    });
+            } else {
+                var obj = null,
+                    found = false,
+                    path = '/' + kind;
+
+                _.each(pm.routes, function(route, rid) {
+                    if (!found && route.uri === path && (!route.access || (route.access && ((route.access == 'auth' && C.client) || (route.access == 'guest' && !C.client))))) {
+                        found = true;
+                        if (pm.pages[rid]) {
+                            C.loadingOverlay.remove('pageManager opening from memory ' + rid);
+                            return pm.open(rid, split.slice(2), {
+                                pushState: options.pushState
+                            });
+                        } else {
+                            obj = route.obj;
+                        }
+                    }
+                });
+
+                if (obj) {
+                    C.loadingOverlay.remove('pageManager creating object ' + obj);
+                    return new C[obj](split ? split.slice(2) : []);
+                } else if (!found) {
+                    C.loadingOverlay.remove('pageManager opening last');
+                    return pm.showLast();
+                }
+            }
+        }
+    });
+
+    jsface.extend(C.PageManager, PageManagerExtended);
 })();
