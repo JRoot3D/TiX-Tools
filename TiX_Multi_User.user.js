@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -137,7 +137,7 @@
 
     function findTarget(userId) {
         var room = CF_getCurrentRoom();
-        var targetAvatar = room ? room.avatars[userId];
+        var targetAvatar = room ? room.avatars[userId] : undefined;
         if (targetAvatar) {
             roomRequestFollow(room, targetAvatar.x, targetAvatar.y);
         }
