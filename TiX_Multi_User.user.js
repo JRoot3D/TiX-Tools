@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.6
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -26,8 +26,6 @@
 
     CF_addStyle('alertifyCSS');
     CF_addStyle('alertifyDefaultCSS');
-
-    var _target;
 
     function showUsers() {
         var userList = GM_listValues();
@@ -120,31 +118,6 @@
     GM_registerMenuCommand("Select User", showUsers);
     GM_registerMenuCommand("Add User", addUser);
 
-
-    function setFollowTarget(flag) {
-        if (flag) {
-            alertify.prompt('Follow target', 'User ID', '', function(evt, value) {
-                _target = value;
-                findTarget(value);
-            }, function() {
-                _target = undefined;
-                _followMenu.setMenuState(false);
-            });
-        } else {
-            _target = undefined;
-        }
-    }
-
-    function findTarget(userId) {
-        var room = CF_getCurrentRoom();
-        var targetAvatar = room ? room.avatars[userId] : undefined;
-        if (targetAvatar) {
-            roomRequestFollow(room, targetAvatar.x, targetAvatar.y);
-        }
-    }
-
-    var _followMenu = CF_registerCheckBoxMenuCommand('Follow', false, setFollowTarget);
-
     var initCustomContent = function() {
         var selectUserMenuItem = '<a class="el users"><span class="Square FA FA-users"></span><span class="title">Select User</span></a>';
         var linkSelectUser = $('.Menu .capsule .wardrobe').after(selectUserMenuItem).next();
@@ -231,90 +204,5 @@
         }
     });
 
-    var fun = coastline.funMaker({
-        add_this: true
-    });
-
-    function roomRequestFollow(room, x, y) {
-        room.request('move', {
-            'x': x,
-            'y': y - 1
-        }, function(data) {
-            if (!data.moving) {
-                room.request('move', {
-                    'x': x,
-                    'y': y + 1
-                }, function(data) {
-                    if (!data.moving) {
-                        room.request('move', {
-                            'x': x - 1,
-                            'y': y
-                        }, function(data) {
-                            if (!data.moving) {
-                                room.request('move', {
-                                    'x': x + 1,
-                                    'y': y
-                                }, function(data) {
-                                    if (!data.moving) {
-                                        room.request('move', {
-                                            'x': x - 1,
-                                            'y': y - 1
-                                        }, function(data) {
-                                            if (!data.moving) {
-                                                room.request('move', {
-                                                    'x': x + 1,
-                                                    'y': y - 1
-                                                }, function(data) {
-                                                    if (!data.moving) {
-                                                        room.request('move', {
-                                                            'x': x + 1,
-                                                            'y': y + 1
-                                                        }, function(data) {
-                                                            if (!data.moving) {
-                                                                room.request('move', {
-                                                                    'x': x - 1,
-                                                                    'y': y + 1
-                                                                }, function(data) {
-                                                                    if (!data.moving) {
-
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    var RoomFolover = Class({
-        event_move: fun(function(c, room, msg) {
-            room.avatars[msg.user.id].startMoving(msg);
-            if (_target) {
-                if (msg.user.id == _target) {
-                    var last = msg.path.length - 1;
-                    var x, y;
-                    if (last > -1) {
-                        x = msg.path[last][0];
-                        y = msg.path[last][1];
-                    } else {
-                        x = msg.x;
-                        y = msg.y;
-                    }
-                    roomRequestFollow(room, x, y);
-                }
-            }
-        })
-    });
-
-    jsface.extend(C.Room, RoomFolover);
     jsface.extend(C.PageManager, PageManagerExtended);
 })();

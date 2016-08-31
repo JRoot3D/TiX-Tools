@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Moder Tools
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -23,6 +23,8 @@
 
     CF_addStyle('alertifyCSS');
     CF_addStyle('alertifyDefaultCSS');
+
+    var _target;
 
     var refExp_img = new RegExp('jpg|png|gif|jpeg', 'ig');
 
@@ -53,11 +55,112 @@
             });
     }
 
+    function setFollowTarget(flag) {
+        if (flag) {
+            alertify.prompt('Follow target', 'User ID', '', function(evt, value) {
+                _target = value;
+                findTarget(value);
+            }, function() {
+                _target = undefined;
+                _followMenu.setMenuState(false);
+            });
+        } else {
+            _target = undefined;
+        }
+    }
+
+    function findTarget(userId) {
+        var room = CF_getCurrentRoom();
+        var targetAvatar = room ? room.avatars[userId] : undefined;
+        if (targetAvatar) {
+            roomRequestFollow(room, targetAvatar.x, targetAvatar.y);
+        }
+    }
+
+    var _followMenu = CF_registerCheckBoxMenuCommand('Follow', false, setFollowTarget);
+
+    function roomRequestFollow(room, x, y) {
+        room.request('move', {
+            'x': x,
+            'y': y - 1
+        }, function(data) {
+            if (!data.moving) {
+                room.request('move', {
+                    'x': x,
+                    'y': y + 1
+                }, function(data) {
+                    if (!data.moving) {
+                        room.request('move', {
+                            'x': x - 1,
+                            'y': y
+                        }, function(data) {
+                            if (!data.moving) {
+                                room.request('move', {
+                                    'x': x + 1,
+                                    'y': y
+                                }, function(data) {
+                                    if (!data.moving) {
+                                        room.request('move', {
+                                            'x': x - 1,
+                                            'y': y - 1
+                                        }, function(data) {
+                                            if (!data.moving) {
+                                                room.request('move', {
+                                                    'x': x + 1,
+                                                    'y': y - 1
+                                                }, function(data) {
+                                                    if (!data.moving) {
+                                                        room.request('move', {
+                                                            'x': x + 1,
+                                                            'y': y + 1
+                                                        }, function(data) {
+                                                            if (!data.moving) {
+                                                                room.request('move', {
+                                                                    'x': x - 1,
+                                                                    'y': y + 1
+                                                                }, function(data) {
+                                                                    if (!data.moving) {
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     var fun = coastline.funMaker({
         add_this: true
     });
 
     var RoomModerator = Class({
+        event_move: fun(function(c, room, msg) {
+            room.avatars[msg.user.id].startMoving(msg);
+            if (_target) {
+                if (msg.user.id == _target) {
+                    var last = msg.path.length - 1;
+                    var x, y;
+                    if (last > -1) {
+                        x = msg.path[last][0];
+                        y = msg.path[last][1];
+                    } else {
+                        x = msg.x;
+                        y = msg.y;
+                    }
+                    roomRequestFollow(room, x, y);
+                }
+            }
+        }),
         makeChatMessage: fun(function(c, room, user, msg) {
             room.makeChatSomething(c, user, msg, {
                 message: true
