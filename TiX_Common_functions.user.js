@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TiX Common functions
-// @version      0.4
+// @version      0.5
 // @author       JRoot3D
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
@@ -14,12 +14,11 @@ function CF_addStyle(name) {
 }
 
 var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
-    var _flag = flag;
-    var _callback = callback;
+    var _flag, _callback;
     var _id = undefined;
+    var _trueCaption, _falseCaption;
 
-    var _trueCaption = trueCaption;
-    var _falseCaption = falseCaption;
+    this.init(trueCaption, falseCaption, flag, callback);
 
     function switchCommand() {
         if (_flag) {
@@ -37,10 +36,21 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
         }
     }
 
-    if (_flag) {
-        _id = GM_registerMenuCommand(_falseCaption, switchCommand);
-    } else {
-        _id = GM_registerMenuCommand(_trueCaption, switchCommand);
+    this.init = function (trueCaption, falseCaption, flag, callback) {
+        _flag = flag;
+        _callback = callback;
+        _trueCaption = trueCaption;
+        _falseCaption = falseCaption;
+        this.setMenuState(flag);
+    }
+
+    this.setMenuState = function (flag) {
+        _flag = flag;
+        if (flag) {
+            _id = GM_registerMenuCommand(_falseCaption, switchCommand);
+        } else {
+            _id = GM_registerMenuCommand(_trueCaption, switchCommand);
+        }
     }
 
     this.getFlag = function() {
@@ -49,6 +59,7 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
 
     this.unregister = function() {
         GM_unregisterMenuCommand(_id);
+        _id = undefined;
     };
 
     this.setCallback = function(value) {
