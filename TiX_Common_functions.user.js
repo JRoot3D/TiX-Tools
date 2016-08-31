@@ -37,7 +37,6 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
     }
 
     this.init = function (trueCaption, falseCaption, flag, callback) {
-        _flag = flag;
         _callback = callback;
         _trueCaption = trueCaption;
         _falseCaption = falseCaption;
@@ -46,6 +45,7 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
 
     this.setMenuState = function (flag) {
         _flag = flag;
+        this.unregister();
         if (flag) {
             _id = GM_registerMenuCommand(_falseCaption, switchCommand);
         } else {
