@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Multi User
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -125,12 +125,21 @@
         if (flag) {
             alertify.prompt('Follow target', 'User ID', '', function(evt, value) {
                 _target = value;
+                findTarget(value);
             }, function() {
                 _target = undefined;
                 _followMenu.setMenuState(false);
             });
         } else {
             _target = undefined;
+        }
+    }
+
+    function findTarget(userId) {
+        var room = CF_getCurrentRoom();
+        var targetAvatar = room ? room.avatars[userId];
+        if (targetAvatar) {
+            roomRequestFollow(room, targetAvatar.x, targetAvatar.y);
         }
     }
 
