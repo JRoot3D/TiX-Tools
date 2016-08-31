@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TiX Common functions
-// @version      0.5
+// @version      0.6
 // @author       JRoot3D
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
@@ -17,8 +17,6 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
     var _flag, _callback;
     var _id = undefined;
     var _trueCaption, _falseCaption;
-
-    this.init(trueCaption, falseCaption, flag, callback);
 
     function switchCommand() {
         if (_flag) {
@@ -65,6 +63,8 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
     this.setCallback = function(value) {
         _callback = value;
     };
+
+    this.init(trueCaption, falseCaption, flag, callback);
 };
 
 function CF_registerCheckBoxMenuCommand(caption, flag, callback) {
