@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      1.7
+// @version      1.8
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -39,7 +39,7 @@
     }
 
     function setChatTextColorMenu() {
-        alertify.prompt('Select new Color', 'Color', '', function(event, value) {
+        alertify.prompt('Select new Color', 'Color', '#000080', function(event, value) {
             setChatTextColor(value);
             GM_setValue('chatTextColor', value);
         }, function() {}).set('type', 'color');
