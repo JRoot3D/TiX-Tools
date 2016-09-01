@@ -5,7 +5,7 @@
 <% } %>
 <button class="vote" title="Поддержать печенькой (стоит 1 печеньку)"></button>
 <% } %>
-<div class="text <%= _.contains(msg.data && msg.data.highlightedUsers, C.user.id) ? 'highlighted' : (msg.user && msg.user.id == C.user.id) ? 'my' : '' %>" data-time="<%= msg.time %>">
+<div class="text <%= _.contains(msg.data && msg.data.highlightedUsers, C.user.id) ? 'highlighted' : (msg.user && msg.user.id == C.user.id) ? 'my' : (msg.data && msg.data.highlightedUsers && msg.user && msg.user.id == C.user.id) ? 'myh' : '') %>" data-time="<%= msg.time %>">
 <%= msg.text %>
 </div>
 <div class="votes">
