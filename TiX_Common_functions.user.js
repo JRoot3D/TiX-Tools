@@ -1,11 +1,7 @@
 // ==UserScript==
 // @name         TiX Common functions
-// @version      0.7
+// @version      0.8
 // @author       JRoot3D
-// @grant        GM_unregisterMenuCommand
-// @grant        GM_registerMenuCommand
-// @grant        GM_getResourceText
-// @grant        GM_addStyle
 // ==/UserScript==
 
 function CF_addStyle(name) {
@@ -87,13 +83,17 @@ function CF_getCurrentRoom() {
 
 var _valueObject = function(name, defaultValue) {
     var _name, _defaultValue;
-    var _valueChangeListener, _valueChangeListenerId;
+    var _valueChangeListener = undefined;
+    var _valueChangeListenerId = undefined;
 
     this.set = function(value) {
         GM_setValue(_name, value);
     }
 
-    this.get = function() {
+    this.get = function(value) {
+        if (value) {
+            return GM_getValue(_name, value);
+        }
         return GM_getValue(_name, _defaultValue);
     }
 

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TiX Alertify dialogs
-// @version      0.2
+// @version      0.3
 // @author       JRoot3D
 // ==/UserScript==
 var keys = {
