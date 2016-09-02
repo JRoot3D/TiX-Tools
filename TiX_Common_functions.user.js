@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TiX Common functions
-// @version      0.6
+// @version      0.7
 // @author       JRoot3D
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
@@ -86,15 +86,26 @@ function CF_getCurrentRoom() {
 }
 
 var _valueObject = function(name, defaultValue) {
-    var _name;
-    var _defaultValue;
-    
+    var _name, _defaultValue;
+    var _valueChangeListener, _valueChangeListenerId;
+
     this.set = function(value) {
         GM_setValue(_name, value);
     }
 
     this.get = function() {
         return GM_getValue(_name, _defaultValue);
+    }
+
+    this.addListener = function(listener) {
+        _valueChangeListener = listener;
+        _valueChangeListenerId = GM_addValueChangeListener(_name, function(name, old_value, new_value, remote) {
+            _valueChangeListener.call(this, name, old_value, new_value, remote);
+        });
+    }
+
+    this.removeListener = function() {
+        GM_removeValueChangeListener(_valueChangeListenerId);
     }
 
     this.init = function(name, defaultValue) {

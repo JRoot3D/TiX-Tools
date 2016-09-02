@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      1.8
+// @version      1.9
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -107,7 +107,7 @@
             user.initAvatar();
         }),
         makeChatMessage: fun(function(c, room, user, msg) {
-            if (_hideMessageFromBlacklistMenu) {
+            if (_hideMessageFromBlacklistMenu.getFlag()) {
                 var userId = (msg.user && msg.user.id ? msg.user.id : msg.user);
                 if (C.user.data.blacklist.indexOf(userId) == -1) {
                     room.makeChatSomething(c, user, msg, {
