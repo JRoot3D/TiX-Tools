@@ -34,14 +34,14 @@ var _menuCommand = function(trueCaption, falseCaption, flag, callback) {
         }
     }
 
-    this.init = function (trueCaption, falseCaption, flag, callback) {
+    this.init = function(trueCaption, falseCaption, flag, callback) {
         _callback = callback;
         _trueCaption = trueCaption;
         _falseCaption = falseCaption;
         this.setMenuState(flag);
     }
 
-    this.setMenuState = function (flag) {
+    this.setMenuState = function(flag) {
         _flag = flag;
         this.unregister();
         if (flag) {
@@ -76,11 +76,35 @@ function CF_registerSwitcherMenuCommand(trueCaption, falseCaption, flag, callbac
 }
 
 function CF_getCurrentRoom() {
-	var path = location.pathname;
-	if (path.indexOf('room') != -1) {
-		var arr = path.split("/");
-		var roomID = arr[arr.length-1];
-		return C.rooms[roomID];
-	}
-	return null;
+    var path = location.pathname;
+    if (path.indexOf('room') != -1) {
+        var arr = path.split("/");
+        var roomID = arr[arr.length - 1];
+        return C.rooms[roomID];
+    }
+    return null;
+}
+
+var _valueObject = function(name, defaultValue) {
+    var _name;
+    var _defaultValue;
+    
+    this.set = function(value) {
+        GM_setValue(_name, value);
+    }
+
+    this.get = function() {
+        return GM_getValue(_name, _defaultValue);
+    }
+
+    this.init = function(name, defaultValue) {
+        _name = name;
+        _defaultValue = defaultValue;
+    }
+
+    this.init(name, defaultValue);
+}
+
+function CF_value(name, defaultValue) {
+    return new _valueObject(name, defaultValue);
 }
