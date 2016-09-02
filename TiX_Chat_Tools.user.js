@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      1.9
+// @version      2.0
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -13,6 +13,7 @@
 // @grant        GM_addStyle
 // @require      https://cdn.jsdelivr.net/alertifyjs/1.8.0/alertify.min.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Common_functions.user.js
+// @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Alertify_dialogs.user.js
 // @resource     alertifyCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/alertify.min.css
 // @resource     alertifyDefaultCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/themes/default.min.css
 // @resource     chatTextTemplate https://raw.githubusercontent.com/JRoot3D/TiX-Tools/master/chat_text_template.jst
@@ -55,6 +56,29 @@
         GM_setValue('isHideMessageFromBlacklist', value);
     }
     var _hideMessageFromBlacklistMenu = CF_registerCheckBoxMenuCommand('Hide messages from Blacklist', _isHideMessageFromBlacklist, saveMenuFlag);
+    GM_registerMenuCommand('Show Blacklist', showBlackListMenu);
+
+	function showBlackListMenu() {
+		var users = C.user.data.blacklist;
+		if (users.length > 0) {
+			var data = [];
+			for (var i in users) {
+				var id = users[i];
+				var name = id;
+				if(C.User.objects[id]) {
+					name = C.User.objects[id].data.name;
+				}
+				data[i] = {
+					'id': id,
+					'name': name
+				};
+			}
+
+			alertify.showBlacklist('Select User', 'User', data, function (e, id) {
+				C.pageManager.openURI('/user/' + id);
+			});
+		}
+	}
 
     var chatTextTemplate = GM_getResourceText('chatTextTemplate');
     C.templates['chat/text'] = chatTextTemplate;

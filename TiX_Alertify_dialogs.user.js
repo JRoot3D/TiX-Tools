@@ -263,3 +263,105 @@ if (!alertify.loginDialog) {
         };
     });
 }
+
+if (!alertify.showBlacklist) {
+    alertify.dialog('showBlacklist', function() {
+        var input = document.createElement('SELECT');
+        var p = document.createElement('P');
+        return {
+            main: function(_title, _message, _value, _onok) {
+                this.set('title', _title);
+                this.set('message', _message);
+                this.set('value', _value);
+                this.set('onok', _onok);
+                return this;
+            },
+            setup: function() {
+                return {
+                    buttons: [{
+                        text: alertify.defaults.glossary.cancel,
+                        key: keys.ESC,
+                        invokeOnClose: true,
+                        className: alertify.defaults.theme.cancel,
+                    }, {
+                        text: alertify.defaults.glossary.ok,
+                        key: keys.ENTER,
+                        className: alertify.defaults.theme.ok,
+                    }],
+                    focus: {
+                        element: input,
+                        select: true
+                    },
+                    options: {
+                        maximizable: false,
+                        resizable: false
+                    }
+                };
+            },
+            build: function() {
+                input.className = alertify.defaults.theme.input;
+                this.elements.content.appendChild(p);
+                this.elements.content.appendChild(input);
+            },
+            prepare: function() {
+                //nothing
+            },
+            setMessage: function(message) {
+                if (typeof message === 'string') {
+                    clearContents(p);
+                    p.innerHTML = message;
+                } else if (message instanceof window.HTMLElement && p.firstChild !== message) {
+                    clearContents(p);
+                    p.appendChild(message);
+                }
+            },
+            settings: {
+                message: undefined,
+                labels: undefined,
+                onok: undefined,
+                oncancel: undefined,
+                value: ''
+            },
+            settingUpdated: function(key, oldValue, newValue) {
+                switch (key) {
+                    case 'message':
+                        this.setMessage(newValue);
+                        break;
+                    case 'value':
+                        clearContents(input);
+                        for (var i = 0; i < newValue.length; i++) {
+                            var option = document.createElement("OPTION");
+                            option.setAttribute("value", newValue[i].id);
+                            option.text = newValue[i].name;
+                            input.appendChild(option);
+                        }
+                        break;
+                }
+            },
+            callback: function(closeEvent) {
+                var returnValue;
+                switch (closeEvent.index) {
+                    case 1:
+                        if (input.length > 0) {
+                            this.settings.value = input.item(input.selectedIndex).value;
+                            if (typeof this.get('onok') === 'function') {
+                                returnValue = this.get('onok').call(this, closeEvent, this.settings.value);
+                                if (typeof returnValue !== 'undefined') {
+                                    closeEvent.cancel = !returnValue;
+                                }
+                            }
+                        }
+                        break;
+                    case 0:
+                        if (typeof this.get('oncancel') === 'function') {
+                            returnValue = this.get('oncancel').call(this, closeEvent);
+                            if (typeof returnValue !== 'undefined') {
+                                closeEvent.cancel = !returnValue;
+                            }
+                        }
+                        break;
+                }
+            }
+        };
+    });
+}
