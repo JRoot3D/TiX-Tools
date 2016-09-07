@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.0
+// @version      2.1
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -16,7 +16,7 @@
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Alertify_dialogs.user.js
 // @resource     alertifyCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/alertify.min.css
 // @resource     alertifyDefaultCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/themes/default.min.css
-// @resource     chatTextTemplate https://raw.githubusercontent.com/JRoot3D/TiX-Tools/master/chat_text_template.jst
+// @resource     chatTextTemplate https://raw.githubusercontent.com/JRoot3D/TiX-Tools/master/chat_text_template.ejs
 // @updateURL    https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Chat_Tools.user.js
 // @downloadURL  https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Chat_Tools.user.js
 // ==/UserScript==
@@ -31,23 +31,40 @@
         add_this: true
     });
 
-    var _chatTextColor = GM_getValue('chatTextColor', '#000080');
-    setChatTextColor(_chatTextColor);
+    var _ownTextColor = GM_getValue('ownTextColor', '#000080');
+    setOwnTextColor(_ownTextColor);
 
-    function setChatTextColor(color) {
-        _chatTextColor = color;
+    function setOwnTextColor(color) {
+        _ownTextColor = color;
         var css = '.ChatMessage .text.my { color: ' + color + '; }';
         GM_addStyle(css);
     }
 
-    function setChatTextColorMenu() {
-        alertify.prompt('Select new Color', 'Color', _chatTextColor, function(event, value) {
-            setChatTextColor(value);
-            GM_setValue('chatTextColor', value);
+    var _friendsTextColor = GM_getValue('friendsTextColor', '#400080');
+    setFriendsTextColor(_friendsTextColor);
+
+    function setFriendsTextColor(color) {
+        _friendsTextColor = color;
+        var css = '.ChatMessage .text.friend { color: ' + color + '; }';
+        GM_addStyle(css);
+    }
+
+    function setOwnTextColorMenu() {
+        alertify.prompt('Select new Color', 'Color', _ownTextColor, function(event, value) {
+            setOwnTextColor(value);
+            GM_setValue('ownTextColor', value);
         }, function() {}).set('type', 'color');
     }
 
-    GM_registerMenuCommand('Set Message Color', setChatTextColorMenu);
+    function setFriendsTextColorMenu() {
+        alertify.prompt('Select new Color', 'Color', _friendsTextColor, function(event, value) {
+            setFriendsTextColor(value);
+            GM_setValue('friendsTextColor', value);
+        }, function() {}).set('type', 'color');
+    }
+
+    GM_registerMenuCommand('Set own Text Color', setOwnTextColorMenu);
+    GM_registerMenuCommand('Set friens Text Color', setFriendsTextColorMenu);
 
     var _isHideMessageFromBlacklist = GM_getValue('isHideMessageFromBlacklist', false);
 
@@ -58,27 +75,27 @@
     var _hideMessageFromBlacklistMenu = CF_registerCheckBoxMenuCommand('Hide messages from Blacklist', _isHideMessageFromBlacklist, saveMenuFlag);
     GM_registerMenuCommand('Show Blacklist', showBlackListMenu);
 
-	function showBlackListMenu() {
-		var users = C.user.data.blacklist;
-		if (users.length > 0) {
-			var data = [];
-			for (var i in users) {
-				var id = users[i];
-				var name = id;
-				if(C.User.objects[id]) {
-					name = C.User.objects[id].data.name;
-				}
-				data[i] = {
-					'id': id,
-					'name': name
-				};
-			}
+    function showBlackListMenu() {
+        var users = C.user.data.blacklist;
+        if (users.length > 0) {
+            var data = [];
+            for (var i in users) {
+                var id = users[i];
+                var name = id;
+                if (C.User.objects[id]) {
+                    name = C.User.objects[id].data.name;
+                }
+                data[i] = {
+                    'id': id,
+                    'name': name
+                };
+            }
 
-			alertify.showBlacklist('Select User', 'User', data, function (e, id) {
-				C.pageManager.openURI('/user/' + id);
-			});
-		}
-	}
+            alertify.showBlacklist('Select User', 'User', data, function(e, id) {
+                C.pageManager.openURI('/user/' + id);
+            });
+        }
+    }
 
     var chatTextTemplate = GM_getResourceText('chatTextTemplate');
     C.templates['chat/text'] = chatTextTemplate;
