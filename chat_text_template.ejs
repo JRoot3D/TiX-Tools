@@ -1,0 +1,18 @@
+<div class="line">
+	<% if (msg.data) { %>
+		<% if ((typeof access !== 'undefined') && (access || C.user.data.admin)) { %>
+			<span class="deleteMessage FA FA-trash" title="Удалить сообщение"></span>
+		<% } %>
+		<button class="vote" title="Поддержать печенькой (стоит 1 печеньку)"></button>
+	<% } %>
+	<div class="text <%= _.contains(msg.data && msg.data.highlightedUsers, C.user.id) ? 'highlighted' : (msg.user && (msg.user == C.user.id || (msg.user.id && msg.user.id == C.user.id))) ? 'my' : (C.contacts[msg.user.id] ? 'friend' : '')  %>" data-time="<%= msg.time %>">
+		<%= msg.text %>
+	</div>
+	<div class="votes">
+		<% if (msg.data && msg.data.votes) { %>
+			<% _.each(msg.data.votes, function (uid) { var user = C.user.get(uid); %>
+				<span title="<%= user && user.data.name || '' %>"></span>
+			<% }); %>
+		<% } %>
+	</div>
+</div>
