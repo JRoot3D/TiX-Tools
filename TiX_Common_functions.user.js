@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         TiX Common functions
-// @version      0.8
 // @author       JRoot3D
 // ==/UserScript==
+
+var CF_VERSION = 0.9;
 
 function CF_addStyle(name) {
     var style = GM_getResourceText(name);
@@ -81,8 +82,8 @@ function CF_getCurrentRoom() {
     return null;
 }
 
-var _valueObject = function(name, defaultValue) {
-    var _name, _defaultValue;
+var _valueObject = function(name, defaultValue, tag) {
+    var _name, _defaultValue, _tag;
     var _valueChangeListener = undefined;
     var _valueChangeListenerId = undefined;
 
@@ -100,7 +101,7 @@ var _valueObject = function(name, defaultValue) {
     this.addListener = function(listener) {
         _valueChangeListener = listener;
         _valueChangeListenerId = GM_addValueChangeListener(_name, function(name, old_value, new_value, remote) {
-            _valueChangeListener.call(this, name, old_value, new_value, remote);
+            _valueChangeListener.call(this, name, new_value, _tag, old_value, remote);
         });
     }
 
@@ -108,14 +109,27 @@ var _valueObject = function(name, defaultValue) {
         GM_removeValueChangeListener(_valueChangeListenerId);
     }
 
-    this.init = function(name, defaultValue) {
-        _name = name;
-        _defaultValue = defaultValue;
+    this.getTag = function() {
+        return _tag;
     }
 
-    this.init(name, defaultValue);
+    this.init = function(name, defaultValue, tag) {
+        _name = name;
+        _defaultValue = defaultValue;
+        _tag = tag;
+    }
+
+    this.init(name, defaultValue, tag);
 }
 
-function CF_value(name, defaultValue) {
-    return new _valueObject(name, defaultValue);
+function CF_value(name, defaultValue, tag) {
+    return new _valueObject(name, defaultValue, tag);
+}
+
+function CF_checkVersion(version) {
+    var result = version <= CF_VERSION;
+    if (!result) {
+        GM_log('Wrong version, need CF v' + version);
+    }
+    return result;
 }
