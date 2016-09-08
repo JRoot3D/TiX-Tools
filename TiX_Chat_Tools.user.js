@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.1
+// @version      2.2
 // @author       JRoot3D
 // @match        https://tixchat.com/*
+// @grant        GM_addValueChangeListener
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
@@ -11,6 +12,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_addStyle
+// @grant        GM_log
 // @require      https://cdn.jsdelivr.net/alertifyjs/1.8.0/alertify.min.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Common_functions.user.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Alertify_dialogs.user.js
@@ -24,6 +26,23 @@
 (function() {
     'use strict';
 
+    if (!CF_checkVersion(0.9)) {
+        return;
+    }
+
+    var OWN_TEXT_COLOR = {
+        name: 'ownTextColor',
+        color: '#000080',
+        tag: 'my'
+    };
+    var FRIENDS_TEXT_COLOR = {
+        name: 'friendsTextColor',
+        color: '#400080',
+        tag: 'friend'
+    };
+
+    var HIDE_MESSAGE_FROM_BLACK_LIST = 'isHideMessageFromBlacklist';
+
     CF_addStyle('alertifyCSS');
     CF_addStyle('alertifyDefaultCSS');
 
@@ -31,48 +50,46 @@
         add_this: true
     });
 
-    var _ownTextColor = GM_getValue('ownTextColor', '#000080');
-    setOwnTextColor(_ownTextColor);
+    var _ownTextColor = CF_value(OWN_TEXT_COLOR.name, OWN_TEXT_COLOR.color, OWN_TEXT_COLOR.tag);
+    _ownTextColor.addListener(valuesListener);
+    var _friendsTextColor = CF_value(FRIENDS_TEXT_COLOR.name, FRIENDS_TEXT_COLOR.color, FRIENDS_TEXT_COLOR.tag);
+    _friendsTextColor.addListener(valuesListener);
 
-    function setOwnTextColor(color) {
-        _ownTextColor = color;
-        var css = '.ChatMessage .text.my { color: ' + color + '; }';
-        GM_addStyle(css);
+    setStyleColor(_ownTextColor.get(), _ownTextColor.getTag());
+    setStyleColor(_friendsTextColor.get(), _friendsTextColor.getTag());
+
+    function valuesListener(name, value, tag) {
+        setStyleColor(value, tag);
     }
 
-    var _friendsTextColor = GM_getValue('friendsTextColor', '#400080');
-    setFriendsTextColor(_friendsTextColor);
-
-    function setFriendsTextColor(color) {
-        _friendsTextColor = color;
-        var css = '.ChatMessage .text.friend { color: ' + color + '; }';
+    function setStyleColor(color, tag) {
+        var css = '.ChatMessage .text.' + tag + ' { color: ' + color + '; }';
         GM_addStyle(css);
     }
 
     function setOwnTextColorMenu() {
-        alertify.prompt('Select new Color', 'Color', _ownTextColor, function(event, value) {
-            setOwnTextColor(value);
-            GM_setValue('ownTextColor', value);
-        }, function() {}).set('type', 'color');
+        showSetColorDialog(_ownTextColor);
     }
 
     function setFriendsTextColorMenu() {
-        alertify.prompt('Select new Color', 'Color', _friendsTextColor, function(event, value) {
-            setFriendsTextColor(value);
-            GM_setValue('friendsTextColor', value);
+        showSetColorDialog(_friendsTextColor);
+    }
+
+    function showSetColorDialog(color) {
+        alertify.prompt('Select new Color', 'Color', color.get(), function(event, value) {
+            color.set(value);
         }, function() {}).set('type', 'color');
     }
 
     GM_registerMenuCommand('Set own Text Color', setOwnTextColorMenu);
     GM_registerMenuCommand('Set friens Text Color', setFriendsTextColorMenu);
 
-    var _isHideMessageFromBlacklist = GM_getValue('isHideMessageFromBlacklist', false);
+    var _isHideMessageFromBlacklist = CF_value(HIDE_MESSAGE_FROM_BLACK_LIST, false);
 
     function saveMenuFlag(value) {
-        _isHideMessageFromBlacklist = value;
-        GM_setValue('isHideMessageFromBlacklist', value);
+        _isHideMessageFromBlacklist.set(value);
     }
-    var _hideMessageFromBlacklistMenu = CF_registerCheckBoxMenuCommand('Hide messages from Blacklist', _isHideMessageFromBlacklist, saveMenuFlag);
+    var _hideMessageFromBlacklistMenu = CF_registerCheckBoxMenuCommand('Hide messages from Blacklist', _isHideMessageFromBlacklist.get(), saveMenuFlag);
     GM_registerMenuCommand('Show Blacklist', showBlackListMenu);
 
     function showBlackListMenu() {
