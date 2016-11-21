@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Moder Tools
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -24,7 +24,7 @@
 
     unsafeWindow.isModerToolsLoaded = true;
     if (unsafeWindow.isChatToolsLoaded) {
-        alertify.error('Conflict with Chat Tools');
+        alertify.error('Moder Tools conflict with Chat Tools');
     }
 
     CF_addStyle('alertifyCSS');

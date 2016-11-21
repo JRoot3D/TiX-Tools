@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.6
+// @version      2.7
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -33,7 +33,7 @@
 
     unsafeWindow.isChatToolsLoaded = true;
     if (unsafeWindow.isModerToolsLoaded) {
-        alertify.error('Conflict with Moder Tools');
+        alertify.error('Chat Tools conflict with Moder Tools');
     }
 
     var OWN_TEXT_COLOR = {
