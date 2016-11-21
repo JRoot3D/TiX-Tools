@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.5
+// @version      2.6
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -9,6 +9,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
 // @grant        GM_notification
+// @grant        unsafeWindow
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_addStyle
@@ -30,8 +31,8 @@
         return;
     }
 
-    window.isChatToolsLoaded = true;
-    if (window.isModerToolsLoaded) {
+    unsafeWindow.isChatToolsLoaded = true;
+    if (unsafeWindow.isModerToolsLoaded) {
         alertify.error('Conflict with Moder Tools');
     }
 

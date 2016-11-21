@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         TiX Moder Tools
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
+// @grant        unsafeWindow
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_addStyle
@@ -21,8 +22,8 @@
 (function() {
     'use strict';
 
-    window.isModerToolsLoaded = true;
-    if (window.isChatToolsLoaded) {
+    unsafeWindow.isModerToolsLoaded = true;
+    if (unsafeWindow.isChatToolsLoaded) {
         alertify.error('Conflict with Chat Tools');
     }
 
