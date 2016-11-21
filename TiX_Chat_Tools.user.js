@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.3
+// @version      2.4
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -186,6 +186,7 @@
 
                                 if (counter >= value) {
                                     clearInterval(interval);
+                                    alertify.notify('Done');
                                 }
                             }, 200);
                         }
@@ -207,6 +208,7 @@
 
                                 if (counter >= value) {
                                     clearInterval(interval);
+                                    alertify.notify('Done');
                                 }
                             }, 200);
                         }
@@ -752,6 +754,7 @@
 
                                     if (counter >= value) {
                                         clearInterval(interval);
+                                        alertify.notify('Done');
                                     }
                                 }, 200);
                             }
