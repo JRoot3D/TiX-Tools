@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.7
+// @version      2.8
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -48,6 +48,7 @@
     };
 
     var HIDE_MESSAGE_FROM_BLACK_LIST = 'isHideMessageFromBlacklist';
+    var ENABLE_POPUP_NOTIFICATIONS = 'isEnabledPopupNotifications';
 
     CF_addStyle('alertifyCSS');
     CF_addStyle('alertifyDefaultCSS');
@@ -99,6 +100,14 @@
 
     var _hideMessageFromBlacklistMenu = CF_registerCheckBoxMenuCommand('Hide messages from Blacklist', _isHideMessageFromBlacklist.get(), saveMenuFlag);
     GM_registerMenuCommand('Show Blacklist', showBlackListMenu);
+
+    var _isEnabledPopupNotifications = CF_value(ENABLE_POPUP_NOTIFICATIONS, false);
+
+    var savePopupFlag = function (value) {
+        _isEnabledPopupNotifications.set(value);
+    };
+
+    var _enablePopupNotifications = CF_registerCheckBoxMenuCommand('Enable Popup notifications', _isEnabledPopupNotifications.get(), savePopupFlag);
 
     function showBlackListMenu() {
         var users = C.user.data.blacklist;
@@ -1188,24 +1197,26 @@
             });
 
             if (C.contacts[user.id]) {
-                var details = {};
-                details.text = room.data.name;
-                details.title = user.data.name;
-                var ba = new C.BigAvatar(user, {
-                    height: 64,
-                    width: 64,
-                    offset: -28,
-                    headOnly: true
-                });
-                c.wait(ba);
-                c.q(function (c) {
-                    details.image = C.canvasToBlob(ba.canvas);
-                    details.onclick = function () {
-                        C.pageManager.openURI('/room/' + room.id);
-                        room.chatMessageInput.highlightUser(user);
-                    };
-                    GM_notification(details);
-                });
+                if (_isEnabledPopupNotifications.get()) {
+                    var details = {};
+                    details.text = room.data.name;
+                    details.title = user.data.name;
+                    var ba = new C.BigAvatar(user, {
+                        height: 64,
+                        width: 64,
+                        offset: -28,
+                        headOnly: true
+                    });
+                    c.wait(ba);
+                    c.q(function (c) {
+                        details.image = C.canvasToBlob(ba.canvas);
+                        details.onclick = function () {
+                            C.pageManager.openURI('/room/' + room.id);
+                            room.chatMessageInput.highlightUser(user);
+                        };
+                        GM_notification(details);
+                    });
+                }
 
                 if (!user.leftRooms || !user.leftRooms[room.id] || Date.now() - user.leftRooms[room.id] > 5000) {
                     room.makeChatAction(c, msg.user, msg);
