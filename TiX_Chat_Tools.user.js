@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.8
+// @version      2.9
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -49,6 +49,8 @@
 
     var HIDE_MESSAGE_FROM_BLACK_LIST = 'isHideMessageFromBlacklist';
     var ENABLE_POPUP_NOTIFICATIONS = 'isEnabledPopupNotifications';
+    var SHOW_GREED = 'isNeedToShowGreed';
+    var SHOW_DEBUG_LOG = 'isNeedToShowDebugLog';
 
     CF_addStyle('alertifyCSS');
     CF_addStyle('alertifyDefaultCSS');
@@ -108,6 +110,25 @@
     };
 
     var _enablePopupNotifications = CF_registerCheckBoxMenuCommand('Enable Popup notifications', _isEnabledPopupNotifications.get(), savePopupFlag);
+
+    var _isNeedToShowGreed = CF_value(SHOW_GREED, false);
+    var saveGreedFlag = function (value) {
+        C.client.drawGrid = value;
+        _isNeedToShowGreed.set(value);
+    };
+    var _showGrid = CF_registerCheckBoxMenuCommand ('Show Grid', _isNeedToShowGreed.get(), saveGreedFlag);
+
+    var _isNeedToShowDebugLog = CF_value(SHOW_DEBUG_LOG, false);
+    var saveDebugLogFlag = function (value) {
+        C.debug = value;
+        _isNeedToShowDebugLog.set(value);
+    };
+    var _showDebugLog = CF_registerCheckBoxMenuCommand ('Show Debug Log', _isNeedToShowDebugLog.get(), saveDebugLogFlag);
+
+    var updateDebugSettings = function () {
+        C.client.drawGrid = _isNeedToShowGreed.get();
+        C.debug = _isNeedToShowDebugLog.get();
+    };
 
     function showBlackListMenu() {
         var users = C.user.data.blacklist;
@@ -398,6 +419,7 @@
 
     var RoomExtended = Class({
         init: fun(function (c, room, data) {
+            updateDebugSettings();
             var lastScroll = 0;
             //var closeRoom = function () {
             //	room.request('leave');
