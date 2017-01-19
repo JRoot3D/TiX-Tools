@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      2.9
+// @version      3.0
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -129,6 +129,35 @@
         C.client.drawGrid = _isNeedToShowGreed.get();
         C.debug = _isNeedToShowDebugLog.get();
     };
+
+    var _teleportPosition = {
+        x: 0,
+        y: 0
+    };
+
+    var doTeleportation = function () {
+        var position = _teleportPosition.x + ' ' + _teleportPosition.y;
+        alertify.prompt('Teleport', 'Enter position', position
+            , function (evt, value) {
+                var v = value.split(' ');
+
+                if (v.length === 2) {
+                    var X = parseInt(v[0]);
+                    var Y = parseInt(v[1]);
+
+                    var currentRoom = CF_getCurrentRoom();
+                    if (currentRoom) {
+                        C.localSettings.avatarPosition[currentRoom.id] = {x:X, y:Y};
+                        C.saveSettings();
+                        location.reload();
+                    }
+                }
+            }
+            , function () {
+            });
+    };
+
+    GM_registerMenuCommand('Teleport', doTeleportation);
 
     function showBlackListMenu() {
         var users = C.user.data.blacklist;
@@ -1069,6 +1098,10 @@
                             room.logAction('click thing');
                         }
                         else {
+                            _teleportPosition = {
+                                x: x,
+                                y: y
+                            };
                             room.request('move', {
                                 x: x,
                                 y: y
