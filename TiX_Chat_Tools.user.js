@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.1
+// @version      3.2
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_addValueChangeListener
@@ -1285,7 +1285,8 @@
         makeChatMessage: fun(function (c, room, user, msg) {
             if (_hideMessageFromBlacklistMenu.getFlag()) {
                 var userId = (msg.user && msg.user.id ? msg.user.id : msg.user);
-                if (C.user.data.blacklist && C.user.data.blacklist.indexOf(userId) == -1) {
+                var isBlacklisted = C.user.data.blacklist && C.user.data.blacklist.indexOf(userId) != -1;
+                if (!isBlacklisted) {
                     room.makeChatSomething(c, user, msg, {
                         message: true
                     });
