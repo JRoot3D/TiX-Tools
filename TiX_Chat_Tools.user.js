@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.2
+// @version      3.3
 // @author       JRoot3D
 // @match        https://tixchat.com/*
+// @match        https://names.illemius.xyz/*
 // @grant        GM_addValueChangeListener
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_registerMenuCommand
 // @grant        GM_getResourceText
+// @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 // @grant        unsafeWindow
 // @grant        GM_setValue
@@ -116,18 +118,52 @@
         C.client.drawGrid = value;
         _isNeedToShowGreed.set(value);
     };
-    var _showGrid = CF_registerCheckBoxMenuCommand ('Show Grid', _isNeedToShowGreed.get(), saveGreedFlag);
+    var _showGrid = CF_registerCheckBoxMenuCommand('Show Grid', _isNeedToShowGreed.get(), saveGreedFlag);
 
     var _isNeedToShowDebugLog = CF_value(SHOW_DEBUG_LOG, false);
     var saveDebugLogFlag = function (value) {
         C.debug = value;
         _isNeedToShowDebugLog.set(value);
     };
-    var _showDebugLog = CF_registerCheckBoxMenuCommand ('Show Debug Log', _isNeedToShowDebugLog.get(), saveDebugLogFlag);
+    var _showDebugLog = CF_registerCheckBoxMenuCommand('Show Debug Log', _isNeedToShowDebugLog.get(), saveDebugLogFlag);
+
+    var requestNewName = function () {
+        var sex = C.user.data.sex;
+
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: 'https://names.illemius.xyz/getName?sex=' + sex,
+            onreadystatechange: function (response) {
+                if (response.readyState !== 4)
+                    return;
+
+                var nameObject = JSON.parse(response.responseText);
+                var name = nameObject.full;
+                alertify.success(name, 5, function () {
+                    C.user.request('editProfile', {name: name});
+                });
+            }
+        });
+    };
+
+    GM_registerMenuCommand('Random Name', requestNewName);
+
+    var initCustomContent = function() {
+        var GenerateNewName = '<a class="el users"><span class="Square FA FA-random"></span><span class="title">Random Name</span></a>';
+        var linkSelectUser = $('.Menu .capsule .top').after(GenerateNewName).next();
+        linkSelectUser.on('click', function(e) {
+            requestNewName();
+        });
+        initCustomContent = undefined;
+    };
 
     var updateDebugSettings = function () {
         C.client.drawGrid = _isNeedToShowGreed.get();
         C.debug = _isNeedToShowDebugLog.get();
+
+        if (initCustomContent) {
+            initCustomContent();
+        }
     };
 
     var _teleportPosition = {
@@ -147,7 +183,7 @@
 
                     var currentRoom = CF_getCurrentRoom();
                     if (currentRoom) {
-                        C.localSettings.avatarPosition[currentRoom.id] = {x:X, y:Y};
+                        C.localSettings.avatarPosition[currentRoom.id] = {x: X, y: Y};
                         C.saveSettings();
                         location.reload();
                     }
