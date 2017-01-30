@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.5
+// @version      3.6
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @match        https://names.illemius.xyz/*
@@ -165,6 +165,10 @@
     var updateDebugSettings = function () {
         C.client.drawGrid = _isNeedToShowGreed.get();
         C.debug = _isNeedToShowDebugLog.get();
+
+        if (!C.debug) {
+            console.clear();
+        }
 
         if (initCustomContent) {
             initCustomContent();
