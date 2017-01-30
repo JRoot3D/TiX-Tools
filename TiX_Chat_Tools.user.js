@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.4
+// @version      3.5
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @match        https://names.illemius.xyz/*
@@ -139,6 +139,8 @@
 
                 var nameObject = JSON.parse(response.responseText);
                 var name = nameObject.full;
+
+                GM_log(name);
 
                 alertify.success(name).delay(10).callback = function (isClicked) {
                     if (isClicked) {
