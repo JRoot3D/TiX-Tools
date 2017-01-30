@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.3
+// @version      3.4
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @match        https://names.illemius.xyz/*
@@ -139,19 +139,22 @@
 
                 var nameObject = JSON.parse(response.responseText);
                 var name = nameObject.full;
-                alertify.success(name, 5, function () {
-                    C.user.request('editProfile', {name: name});
-                });
+
+                alertify.success(name).delay(10).callback = function (isClicked) {
+                    if (isClicked) {
+                        C.user.request('editProfile', {name: name});
+                    }
+                };
             }
         });
     };
 
     GM_registerMenuCommand('Random Name', requestNewName);
 
-    var initCustomContent = function() {
+    var initCustomContent = function () {
         var GenerateNewName = '<a class="el users"><span class="Square FA FA-random"></span><span class="title">Random Name</span></a>';
         var linkSelectUser = $('.Menu .capsule .top').after(GenerateNewName).next();
-        linkSelectUser.on('click', function(e) {
+        linkSelectUser.on('click', function (e) {
             requestNewName();
         });
         initCustomContent = undefined;
