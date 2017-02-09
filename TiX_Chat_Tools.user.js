@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Chat Tools
 // @namespace    https://tixchat.com/
-// @version      3.6
+// @version      3.7
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @match        https://names.illemius.xyz/*
@@ -48,6 +48,8 @@
         color: '#400080',
         tag: 'friend'
     };
+
+    var KOOCKIE_INTERVAL = 100;
 
     var HIDE_MESSAGE_FROM_BLACK_LIST = 'isHideMessageFromBlacklist';
     var ENABLE_POPUP_NOTIFICATIONS = 'isEnabledPopupNotifications';
@@ -298,7 +300,7 @@
                                     clearInterval(interval);
                                     alertify.notify('Done');
                                 }
-                            }, 200);
+                            }, KOOCKIE_INTERVAL);
                         }
                         , function () {
                         });
@@ -320,7 +322,7 @@
                                     clearInterval(interval);
                                     alertify.notify('Done');
                                 }
-                            }, 200);
+                            }, KOOCKIE_INTERVAL);
                         }
                         , function () {
                         });
@@ -867,7 +869,7 @@
                                         clearInterval(interval);
                                         alertify.notify('Done');
                                     }
-                                }, 200);
+                                }, KOOCKIE_INTERVAL);
                             }
                             , function () {
                             });

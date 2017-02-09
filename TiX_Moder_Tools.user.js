@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TiX Moder Tools
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.1
 // @author       JRoot3D
 // @match        https://tixchat.com/*
 // @grant        GM_unregisterMenuCommand
@@ -13,13 +13,13 @@
 // @grant        GM_addStyle
 // @require      https://cdn.jsdelivr.net/alertifyjs/1.8.0/alertify.min.js
 // @require      https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Common_functions.user.js
-// @resource     alertifyCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/alertify.min.css
-// @resource     alertifyDefaultCSS https://cdn.jsdelivr.net/alertifyjs/1.8.0/css/themes/default.min.css
+// @resource     alertifyCSS https://cdn.jsdelivr.net/alertifyjs/1.9.0/css/alertify.min.css
+// @resource     alertifyDefaultCSS https://cdn.jsdelivr.net/alertifyjs/1.9.0/css/themes/default.min.css
 // @updateURL    https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Moder_Tools.user.js
 // @downloadURL  https://github.com/JRoot3D/TiX-Tools/raw/master/TiX_Moder_Tools.user.js
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     unsafeWindow.isModerToolsLoaded = true;
@@ -54,19 +54,19 @@
             room.request('removeMessage', {
                 uid: user.id,
                 time: msg.time
-            }, function(data) {
+            }, function (data) {
                 alertify.error('Removed "' + type + '" message from:' + user.data.name);
-            }).grab('access denied', function() {
+            }).grab('access denied', function () {
                 C.Alert(T('Access denied'));
             });
     }
 
     function setFollowTarget(flag) {
         if (flag) {
-            alertify.prompt('Follow target', 'User ID', '', function(evt, value) {
+            alertify.prompt('Follow target', 'User ID', '', function (evt, value) {
                 _target = value;
                 findTarget(value);
-            }, function() {
+            }, function () {
                 _target = undefined;
                 _followMenu.setMenuState(false);
             });
@@ -89,42 +89,42 @@
         room.request('move', {
             'x': x,
             'y': y - 1
-        }, function(data) {
+        }, function (data) {
             if (!data.moving) {
                 room.request('move', {
                     'x': x,
                     'y': y + 1
-                }, function(data) {
+                }, function (data) {
                     if (!data.moving) {
                         room.request('move', {
                             'x': x - 1,
                             'y': y
-                        }, function(data) {
+                        }, function (data) {
                             if (!data.moving) {
                                 room.request('move', {
                                     'x': x + 1,
                                     'y': y
-                                }, function(data) {
+                                }, function (data) {
                                     if (!data.moving) {
                                         room.request('move', {
                                             'x': x - 1,
                                             'y': y - 1
-                                        }, function(data) {
+                                        }, function (data) {
                                             if (!data.moving) {
                                                 room.request('move', {
                                                     'x': x + 1,
                                                     'y': y - 1
-                                                }, function(data) {
+                                                }, function (data) {
                                                     if (!data.moving) {
                                                         room.request('move', {
                                                             'x': x + 1,
                                                             'y': y + 1
-                                                        }, function(data) {
+                                                        }, function (data) {
                                                             if (!data.moving) {
                                                                 room.request('move', {
                                                                     'x': x - 1,
                                                                     'y': y + 1
-                                                                }, function(data) {
+                                                                }, function (data) {
                                                                     if (!data.moving) {
 
                                                                     }
@@ -150,7 +150,7 @@
     });
 
     var RoomModerator = Class({
-        event_move: fun(function(c, room, msg) {
+        event_move: fun(function (c, room, msg) {
             room.avatars[msg.user.id].startMoving(msg);
             if (_target) {
                 if (msg.user.id == _target) {
@@ -167,7 +167,7 @@
                 }
             }
         }),
-        makeChatMessage: fun(function(c, room, user, msg) {
+        makeChatMessage: fun(function (c, room, user, msg) {
             room.makeChatSomething(c, user, msg, {
                 message: true
             });
@@ -186,4 +186,21 @@
     });
 
     jsface.extend(C.Room, RoomModerator);
+
+    var unbanUser = function () {
+        var room = CF_getCurrentRoom();
+        if (room) {
+            alertify.prompt('Unban User', 'ID', ''
+                , function (evt, value) {
+                    room.request('unbanUser', {
+                        uid: value
+                    });
+                }
+                , function () {
+
+                });
+        }
+    };
+
+    GM_registerMenuCommand("Unban User", unbanUser);
 })();
